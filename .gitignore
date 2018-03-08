@@ -1,0 +1,6 @@
+﻿AstarPathfindingProjectForConsole/Library/
+AstarPathfindingProjectForConsole/Library/*
+AstarPathfindingProjectForConsole/obj/
+AstarPathfindingProjectForConsole/Temp/
+AstarPathfindingProjectForConsole/*.booproj
+AstarPathfindingProjectForConsole/*.unityproj
