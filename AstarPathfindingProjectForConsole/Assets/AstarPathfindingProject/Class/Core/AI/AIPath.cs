@@ -38,343 +38,361 @@ using Pathfinding.Util;
 [RequireComponent(typeof(Seeker))]
 [AddComponentMenu("Pathfinding/AI/AIPath (2D,3D)")]
 [HelpURL("http://arongranberg.com/astar/docs/class_a_i_path.php")]
-public class AIPath : AIBase {
-	/** Determines how often it will search for new paths.
+public class AIPath : AIBase
+{
+    /** Determines how often it will search for new paths.
 	 * If you have fast moving targets or AIs, you might want to set it to a lower value.
 	 * The value is in seconds between path requests.
 	 */
-	public float repathRate = 0.5F;
+    public float repathRate = 0.5F;
 
-	/** Target to move towards.
+    /** Target to move towards.
 	 * The AI will try to follow/move towards this target.
 	 * It can be a point on the ground where the player has clicked in an RTS for example, or it can be the player object in a zombie game.
 	 */
-	public Transform target;
+    public Transform target;
 
-	/** Enables or disables searching for paths.
+    /** Enables or disables searching for paths.
 	 * Setting this to false does not stop any active path requests from being calculated or stop it from continuing to follow the current path.
 	 * \see #canMove
 	 */
-	public bool canSearch = true;
+    public bool canSearch = true;
 
-	/** Enables or disables movement.
+    /** Enables or disables movement.
 	 * \see #canSearch
 	 */
-	public bool canMove = true;
+    public bool canMove = true;
 
-	/** Maximum velocity.
+    /** Maximum velocity.
 	 * This is the maximum speed in world units per second.
 	 */
-	public float speed = 3;
+    public float speed = 3;
 
-	/** Rotation speed.
+    /** Rotation speed.
 	 * Rotation is calculated using Quaternion.RotateTowards. This variable represents the rotation speed in degrees per second.
 	 * The higher it is, the faster the character will be able to rotate.
 	 */
-	[UnityEngine.Serialization.FormerlySerializedAs("turningSpeed")]
-	public float rotationSpeed = 360;
+    [UnityEngine.Serialization.FormerlySerializedAs("turningSpeed")]
+    public float rotationSpeed = 360;
 
-	/** Distance from the target point where the AI will start to slow down.
+    /** Distance from the target point where the AI will start to slow down.
 	 * Note that this doesn't only affect the end point of the path
 	 * but also any intermediate points, so be sure to set #pickNextWaypointDist to a higher value than this
 	 */
-	public float slowdownDistance = 0.6F;
+    public float slowdownDistance = 0.6F;
 
-	/** Determines within what range it will switch to target the next waypoint in the path */
-	public float pickNextWaypointDist = 2;
+    /** Determines within what range it will switch to target the next waypoint in the path */
+    public float pickNextWaypointDist = 2;
 
-	/** Distance to the end point to consider the end of path to be reached.
+    /** Distance to the end point to consider the end of path to be reached.
 	 * When the end is within this distance then #OnTargetReached will be called and #TargetReached will return true.
 	 */
-	public float endReachedDistance = 0.2F;
+    public float endReachedDistance = 0.2F;
 
-	/** Draws detailed gizmos constantly in the scene view instead of only when the agent is selected and settings are being modified */
-	public bool alwaysDrawGizmos;
+    /** Draws detailed gizmos constantly in the scene view instead of only when the agent is selected and settings are being modified */
+    public bool alwaysDrawGizmos;
 
-	/** Time when the last path request was sent */
-	protected float lastRepath = -9999;
+    /** Time when the last path request was sent */
+    protected float lastRepath = -9999;
 
-	/** Current path which is followed */
-	protected Path path;
+    /** Current path which is followed */
+    protected Path path;
 
-	protected PathInterpolator interpolator = new PathInterpolator();
+    protected PathInterpolator interpolator = new PathInterpolator();
 
-	/** Only when the previous path has been returned should be search for a new path */
-	protected bool canSearchAgain = true;
+    /** Only when the previous path has been returned should be search for a new path */
+    protected bool canSearchAgain = true;
 
-	/** True if the end of the path has been reached */
-	public bool TargetReached { get; protected set; }
+    /** True if the end of the path has been reached */
+    public bool TargetReached { get; protected set; }
 
-	/** True if the Start function has been executed.
+    /** True if the Start function has been executed.
 	 * Used to test if coroutines should be started in OnEnable to prevent calculating paths
 	 * in the awake stage (or rather before start on frame 0).
 	 */
-	private bool startHasRun = false;
+    private bool startHasRun = false;
 
-	/** Point to where the AI is heading */
-	protected Vector3 targetPoint;
+    /** Point to where the AI is heading */
+    protected Vector3 targetPoint;
 
-	protected Vector3 velocity;
+    protected Vector3 velocity;
 
-	/** Rotation speed.
+    /** Rotation speed.
 	 * \deprecated This field has been renamed to #rotationSpeed and is now in degrees per second instead of a damping factor.
 	 */
-	[System.Obsolete("This field has been renamed to #rotationSpeed and is now in degrees per second instead of a damping factor")]
-	public float turningSpeed { get { return rotationSpeed/90; } set { rotationSpeed = value*90; } }
+    [System.Obsolete("This field has been renamed to #rotationSpeed and is now in degrees per second instead of a damping factor")]
+    public float turningSpeed { get { return rotationSpeed / 90; } set { rotationSpeed = value * 90; } }
 
-	/** Starts searching for paths.
+    /** Starts searching for paths.
 	 * If you override this function you should in most cases call base.Start () at the start of it.
 	 * \see #Init
 	 */
-	protected virtual void Start () {
-		startHasRun = true;
-		Init();
-	}
+    public override void Start()
+    {
+        startHasRun = true;
+        Init();
+    }
 
-	/** Called when the component is enabled */
-	protected virtual void OnEnable () {
-		// Make sure we receive callbacks when paths are calculated
-		seeker.pathCallback += OnPathComplete;
-		Init();
-	}
+    /** Called when the component is enabled */
+    public override void OnEnable()
+    {
+        // Make sure we receive callbacks when paths are calculated
+        seeker.pathCallback += OnPathComplete;
+        Init();
+    }
 
-	void Init () {
-		if (startHasRun) {
-			lastRepath = float.NegativeInfinity;
-			StartCoroutine(RepeatTrySearchPath());
-		}
-	}
+    void Init()
+    {
+        if (startHasRun)
+        {
+            lastRepath = float.NegativeInfinity;
+            CustomHelp.StartCoroutine(RepeatTrySearchPath());
+        }
+    }
 
-	public void OnDisable () {
-		seeker.CancelCurrentPathRequest();
+    public void OnDisable()
+    {
+        seeker.CancelCurrentPathRequest();
 
-		// Release current path so that it can be pooled
-		if (path != null) path.Release(this);
-		path = null;
+        // Release current path so that it can be pooled
+        if (path != null) path.Release(this);
+        path = null;
 
-		// Make sure we no longer receive callbacks when paths complete
-		seeker.pathCallback -= OnPathComplete;
-	}
+        // Make sure we no longer receive callbacks when paths complete
+        seeker.pathCallback -= OnPathComplete;
+    }
 
-	/** Tries to search for a path every #repathRate seconds.
+    /** Tries to search for a path every #repathRate seconds.
 	 * \see TrySearchPath
 	 */
-	protected IEnumerator RepeatTrySearchPath () {
-		while (true) yield return new WaitForSeconds(TrySearchPath());
-	}
+    protected IEnumerator RepeatTrySearchPath()
+    {
+        while (true) yield return new WaitForSeconds(TrySearchPath());
+    }
 
-	/** Tries to search for a path.
+    /** Tries to search for a path.
 	 * Will search for a new path if there was a sufficient time since the last repath and both
 	 * #canSearchAgain and #canSearch are true and there is a target.
 	 *
 	 * \returns The time to wait until calling this function again (based on #repathRate)
 	 */
-	public float TrySearchPath () {
-		if (Time.time - lastRepath >= repathRate && canSearchAgain && canSearch && target != null) {
-			SearchPath();
-			return repathRate;
-		} else {
-			float v = repathRate - (Time.time-lastRepath);
-			return v < 0 ? 0 : v;
-		}
-	}
+    public float TrySearchPath()
+    {
+        if (Time.time - lastRepath >= repathRate && canSearchAgain && canSearch && target != null)
+        {
+            SearchPath();
+            return repathRate;
+        }
+        else
+        {
+            float v = repathRate - (Time.time - lastRepath);
+            return v < 0 ? 0 : v;
+        }
+    }
 
-	/** Requests a path to the target */
-	public virtual void SearchPath () {
-		if (target == null) throw new System.InvalidOperationException("Target is null");
+    /** Requests a path to the target */
+    public virtual void SearchPath()
+    {
+        if (target == null) throw new System.InvalidOperationException("Target is null");
 
-		lastRepath = Time.time;
-		// This is where we should search to
-		Vector3 targetPosition = target.position;
+        lastRepath = Time.time;
+        // This is where we should search to
+        Vector3 targetPosition = target.position;
 
-		canSearchAgain = false;
+        canSearchAgain = false;
 
-		// Alternative way of requesting the path
-		//ABPath p = ABPath.Construct(GetFeetPosition(), targetPosition, null);
-		//seeker.StartPath(p);
+        // Alternative way of requesting the path
+        //ABPath p = ABPath.Construct(GetFeetPosition(), targetPosition, null);
+        //seeker.StartPath(p);
 
-		// We should search from the current position
-		seeker.StartPath(GetFeetPosition(), targetPosition);
-	}
+        // We should search from the current position
+        seeker.StartPath(GetFeetPosition(), targetPosition);
+    }
 
-	public virtual void OnTargetReached () {
-		// The end of the path has been reached.
-		// If you want custom logic for when the AI has reached it's destination
-		// add it here.
-		// You can also create a new script which inherits from this one
-		// and override the function in that script
-	}
+    public virtual void OnTargetReached()
+    {
+        // The end of the path has been reached.
+        // If you want custom logic for when the AI has reached it's destination
+        // add it here.
+        // You can also create a new script which inherits from this one
+        // and override the function in that script
+    }
 
-	/** Called when a requested path has finished calculation.
+    /** Called when a requested path has finished calculation.
 	 * A path is first requested by #SearchPath, it is then calculated, probably in the same or the next frame.
 	 * Finally it is returned to the seeker which forwards it to this function.\n
 	 */
-	public virtual void OnPathComplete (Path _p) {
-		ABPath p = _p as ABPath;
+    public virtual void OnPathComplete(Path _p)
+    {
+        ABPath p = _p as ABPath;
 
-		if (p == null) throw new System.Exception("This function only handles ABPaths, do not use special path types");
+        if (p == null) throw new System.Exception("This function only handles ABPaths, do not use special path types");
 
-		canSearchAgain = true;
+        canSearchAgain = true;
 
-		// Claim the new path
-		p.Claim(this);
+        // Claim the new path
+        p.Claim(this);
 
-		// Path couldn't be calculated of some reason.
-		// More info in p.errorLog (debug string)
-		if (p.error) {
-			p.Release(this);
-			return;
-		}
+        // Path couldn't be calculated of some reason.
+        // More info in p.errorLog (debug string)
+        if (p.error)
+        {
+            p.Release(this);
+            return;
+        }
 
-		// Release the previous path
-		if (path != null) path.Release(this);
+        // Release the previous path
+        if (path != null) path.Release(this);
 
-		// Replace the old path
-		path = p;
+        // Replace the old path
+        path = p;
 
-		// Make sure the path contains at least 2 points
-		if (path.vectorPath.Count == 1) path.vectorPath.Add(path.vectorPath[0]);
-		interpolator.SetPath(path.vectorPath);
+        // Make sure the path contains at least 2 points
+        if (path.vectorPath.Count == 1) path.vectorPath.Add(path.vectorPath[0]);
+        interpolator.SetPath(path.vectorPath);
 
-		var graph = AstarData.GetGraph(path.path[0]) as ITransformedGraph;
-		movementPlane = graph != null ? graph.transform : GraphTransform.identityTransform;
+        var graph = AstarData.GetGraph(path.path[0]) as ITransformedGraph;
+        movementPlane = graph != null ? graph.transform : GraphTransform.identityTransform;
 
-		// Reset some variables
-		TargetReached = false;
+        // Reset some variables
+        TargetReached = false;
 
-		// Simulate movement from the point where the path was requested
-		// to where we are right now. This reduces the risk that the agent
-		// gets confused because the first point in the path is far away
-		// from the current position (possibly behind it which could cause
-		// the agent to turn around, and that looks pretty bad).
-		interpolator.MoveToLocallyClosestPoint((GetFeetPosition() + p.originalStartPoint) * 0.5f);
-		interpolator.MoveToLocallyClosestPoint(GetFeetPosition());
-	}
+        // Simulate movement from the point where the path was requested
+        // to where we are right now. This reduces the risk that the agent
+        // gets confused because the first point in the path is far away
+        // from the current position (possibly behind it which could cause
+        // the agent to turn around, and that looks pretty bad).
+        interpolator.MoveToLocallyClosestPoint((GetFeetPosition() + p.originalStartPoint) * 0.5f);
+        interpolator.MoveToLocallyClosestPoint(GetFeetPosition());
+    }
 
-	public virtual Vector3 GetFeetPosition () {
-		if (rvoController != null && rvoController.enabled && rvoController.movementPlane == MovementPlane.XZ) {
-			return tr.position + tr.up*(rvoController.center - rvoController.height*0.5f);
-		}
-		if (controller != null && controller.enabled) {
-			return tr.TransformPoint(controller.center) - Vector3.up*controller.height*0.5F;
-		}
+    public virtual Vector3 GetFeetPosition()
+    {
+        if (rvoController != null && rvoController.enabled && rvoController.movementPlane == MovementPlane.XZ)
+        {
+            return tr.position + tr.up * (rvoController.center - rvoController.height * 0.5f);
+        }
 
-		return tr.position;
-	}
 
-	/** Called during either Update or FixedUpdate depending on if rigidbodies are used for movement or not */
-	protected override void MovementUpdate (float deltaTime) {
-		if (!canMove) return;
+        return tr.position;
+    }
 
-		if (!interpolator.valid) {
-			velocity2D = Vector3.zero;
-		} else {
-			var currentPosition = tr.position;
+    /** Called during either Update or FixedUpdate depending on if rigidbodies are used for movement or not */
+    protected override void MovementUpdate(float deltaTime)
+    {
+        if (!canMove) return;
 
-			interpolator.MoveToLocallyClosestPoint(currentPosition, true, false);
-			interpolator.MoveToCircleIntersection2D(currentPosition, pickNextWaypointDist, movementPlane);
-			targetPoint = interpolator.position;
-			var dir = movementPlane.ToPlane(targetPoint-currentPosition);
+        if (!interpolator.valid)
+        {
+            velocity2D = Vector3.zero;
+        }
+        else
+        {
+            var currentPosition = tr.position;
 
-			var distanceToEnd = dir.magnitude + interpolator.remainingDistance;
-			// How fast to move depending on the distance to the target.
-			// Move slower as the character gets closer to the target.
-			float slowdown = slowdownDistance > 0 ? distanceToEnd / slowdownDistance : 1;
+            interpolator.MoveToLocallyClosestPoint(currentPosition, true, false);
+            interpolator.MoveToCircleIntersection2D(currentPosition, pickNextWaypointDist, movementPlane);
+            targetPoint = interpolator.position;
+            var dir = movementPlane.ToPlane(targetPoint - currentPosition);
 
-			// a = v/t, should probably expose as a variable
-			float acceleration = speed / 0.4f;
-			velocity2D += MovementUtilities.CalculateAccelerationToReachPoint(dir, dir.normalized*speed, velocity2D, acceleration, speed) * deltaTime;
-			velocity2D = MovementUtilities.ClampVelocity(velocity2D, speed, slowdown, true, movementPlane.ToPlane(rotationIn2D ? tr.up : tr.forward));
+            var distanceToEnd = dir.magnitude + interpolator.remainingDistance;
+            // How fast to move depending on the distance to the target.
+            // Move slower as the character gets closer to the target.
+            float slowdown = slowdownDistance > 0 ? distanceToEnd / slowdownDistance : 1;
 
-			ApplyGravity(deltaTime);
+            // a = v/t, should probably expose as a variable
+            float acceleration = speed / 0.4f;
+            velocity2D += MovementUtilities.CalculateAccelerationToReachPoint(dir, dir.normalized * speed, velocity2D, acceleration, speed) * deltaTime;
+            velocity2D = MovementUtilities.ClampVelocity(velocity2D, speed, slowdown, true, movementPlane.ToPlane(rotationIn2D ? tr.up : tr.forward));
 
-			if (distanceToEnd <= endReachedDistance && !TargetReached) {
-				TargetReached = true;
-				OnTargetReached();
-			}
+            //ApplyGravity(deltaTime);
 
-			// Rotate towards the direction we are moving in
-			var currentRotationSpeed = rotationSpeed * Mathf.Clamp01((Mathf.Sqrt(slowdown) - 0.3f) / 0.7f);
-			RotateTowards(velocity2D, currentRotationSpeed * deltaTime);
+            if (distanceToEnd <= endReachedDistance && !TargetReached)
+            {
+                TargetReached = true;
+                OnTargetReached();
+            }
 
-			if (rvoController != null && rvoController.enabled) {
-				// Send a message to the RVOController that we want to move
-				// with this velocity. In the next simulation step, this
-				// velocity will be processed and it will be fed back to the
-				// rvo controller and finally it will be used by this script
-				// when calling the CalculateMovementDelta method below
+            // Rotate towards the direction we are moving in
+            var currentRotationSpeed = rotationSpeed * Mathf.Clamp01((Mathf.Sqrt(slowdown) - 0.3f) / 0.7f);
+            RotateTowards(velocity2D, currentRotationSpeed * deltaTime);
 
-				// Make sure that we don't move further than to the end point
-				// of the path. If the RVO simulation FPS is low and we did
-				// not do this, the agent might overshoot the target a lot.
-				var rvoTarget = currentPosition + movementPlane.ToWorld(Vector2.ClampMagnitude(velocity2D, distanceToEnd), 0f);
-				rvoController.SetTarget(rvoTarget, velocity2D.magnitude, speed);
-			}
-			var delta2D = CalculateDeltaToMoveThisFrame(movementPlane.ToPlane(currentPosition), distanceToEnd, deltaTime);
-			Move(currentPosition, movementPlane.ToWorld(delta2D, verticalVelocity * deltaTime));
+            if (rvoController != null && rvoController.enabled)
+            {
+                // Send a message to the RVOController that we want to move
+                // with this velocity. In the next simulation step, this
+                // velocity will be processed and it will be fed back to the
+                // rvo controller and finally it will be used by this script
+                // when calling the CalculateMovementDelta method below
 
-			velocity = movementPlane.ToWorld(velocity2D, verticalVelocity);
-		}
-	}
+                // Make sure that we don't move further than to the end point
+                // of the path. If the RVO simulation FPS is low and we did
+                // not do this, the agent might overshoot the target a lot.
+                var rvoTarget = currentPosition + movementPlane.ToWorld(Vector2.ClampMagnitude(velocity2D, distanceToEnd), 0f);
+                rvoController.SetTarget(rvoTarget, velocity2D.magnitude, speed);
+            }
+            var delta2D = CalculateDeltaToMoveThisFrame(movementPlane.ToPlane(currentPosition), distanceToEnd, deltaTime);
+            Move(currentPosition, movementPlane.ToWorld(delta2D, verticalVelocity * deltaTime));
 
-	/** Direction that the agent wants to move in (excluding physics and local avoidance).
+            velocity = movementPlane.ToWorld(velocity2D, verticalVelocity);
+        }
+    }
+
+    /** Direction that the agent wants to move in (excluding physics and local avoidance).
 	 * \deprecated Only exists for compatibility reasons.
 	 */
-	[System.Obsolete("Only exists for compatibility reasons.")]
-	public Vector3 targetDirection {
-		get {
-			return (targetPoint - tr.position).normalized;
-		}
-	}
+    [System.Obsolete("Only exists for compatibility reasons.")]
+    public Vector3 targetDirection
+    {
+        get
+        {
+            return (targetPoint - tr.position).normalized;
+        }
+    }
 
-	/** Current desired velocity of the agent (excluding physics and local avoidance but it includes gravity).
+    /** Current desired velocity of the agent (excluding physics and local avoidance but it includes gravity).
 	 * \deprecated This method no longer calculates the velocity. Use the #velocity property instead.
 	 */
-	[System.Obsolete("This method no longer calculates the velocity. Use the velocity property instead")]
-	public Vector3 CalculateVelocity (Vector3 position) {
-		return velocity;
-	}
+    [System.Obsolete("This method no longer calculates the velocity. Use the velocity property instead")]
+    public Vector3 CalculateVelocity(Vector3 position)
+    {
+        return velocity;
+    }
 
 #if UNITY_EDITOR
-	[System.NonSerialized]
-	int gizmoHash = 0;
+    [System.NonSerialized]
+    int gizmoHash = 0;
 
-	[System.NonSerialized]
-	float lastChangedTime = float.NegativeInfinity;
+    [System.NonSerialized]
+    float lastChangedTime = float.NegativeInfinity;
 
-	protected static readonly Color GizmoColor = new Color(46.0f/255, 104.0f/255, 201.0f/255);
+    protected static readonly Color GizmoColor = new Color(46.0f / 255, 104.0f / 255, 201.0f / 255);
 
-	protected override void OnDrawGizmos () {
-		base.OnDrawGizmos();
-		if (alwaysDrawGizmos) OnDrawGizmosInternal();
-	}
+    protected override void OnDrawGizmos()
+    {
+        base.OnDrawGizmos();
+        if (alwaysDrawGizmos) OnDrawGizmosInternal();
+    }
 
-	void OnDrawGizmosSelected () {
-		if (!alwaysDrawGizmos) OnDrawGizmosInternal();
-	}
+    void OnDrawGizmosSelected()
+    {
+        if (!alwaysDrawGizmos) OnDrawGizmosInternal();
+    }
 
-	void OnDrawGizmosInternal () {
-		var newGizmoHash = pickNextWaypointDist.GetHashCode() ^ slowdownDistance.GetHashCode() ^ endReachedDistance.GetHashCode();
+    void OnDrawGizmosInternal()
+    {
+        var newGizmoHash = pickNextWaypointDist.GetHashCode() ^ slowdownDistance.GetHashCode() ^ endReachedDistance.GetHashCode();
 
-		if (newGizmoHash != gizmoHash && gizmoHash != 0) lastChangedTime = Time.realtimeSinceStartup;
-		gizmoHash = newGizmoHash;
-		float alpha = alwaysDrawGizmos ? 1 : Mathf.SmoothStep(1, 0, (Time.realtimeSinceStartup - lastChangedTime - 5f)/0.5f) * (UnityEditor.Selection.gameObjects.Length == 1 ? 1 : 0);
-
-		if (alpha > 0) {
-			// Make sure the scene view is repainted while the gizmos are visible
-			if (!alwaysDrawGizmos) UnityEditor.SceneView.RepaintAll();
-			if (targetPoint != Vector3.zero) Draw.Gizmos.Line(transform.position, targetPoint, GizmoColor * new Color(1, 1, 1, alpha));
-			Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
-			Draw.Gizmos.CircleXZ(Vector3.zero, pickNextWaypointDist, GizmoColor * new Color(1, 1, 1, alpha));
-			Draw.Gizmos.CircleXZ(Vector3.zero, slowdownDistance, Color.Lerp(GizmoColor, Color.red, 0.5f) * new Color(1, 1, 1, alpha));
-			Draw.Gizmos.CircleXZ(Vector3.zero, endReachedDistance, Color.Lerp(GizmoColor, Color.red, 0.8f) * new Color(1, 1, 1, alpha));
-		}
-	}
+        if (newGizmoHash != gizmoHash && gizmoHash != 0) lastChangedTime = Time.realtimeSinceStartup;
+        gizmoHash = newGizmoHash;
+        float alpha = alwaysDrawGizmos ? 1 : Mathf.SmoothStep(1, 0, (Time.realtimeSinceStartup - lastChangedTime - 5f) / 0.5f) * (UnityEditor.Selection.gameObjects.Length == 1 ? 1 : 0);
+    }
 #endif
 
-	protected override int OnUpgradeSerializedData (int version) {
-		// Approximately convert from a damping value to a degrees per second value.
-		if (version < 1) rotationSpeed *= 90;
-		return 1;
-	}
+    protected int OnUpgradeSerializedData(int version)
+    {
+        // Approximately convert from a damping value to a degrees per second value.
+        if (version < 1) rotationSpeed *= 90;
+        return 1;
+    }
 }

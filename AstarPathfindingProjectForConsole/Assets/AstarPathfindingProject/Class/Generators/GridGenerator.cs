@@ -1233,11 +1233,11 @@ namespace Pathfinding {
 		public void ErodeWalkableArea (int xmin, int zmin, int xmax, int zmax) {
 			if (erosionUseTags) {
 				if (erodeIterations+erosionFirstTag > 31) {
-					Debug.LogError("Too few tags available for "+erodeIterations+" erode iterations and starting with tag " + erosionFirstTag + " (erodeIterations+erosionFirstTag > 31)", active);
+					//Debug.LogError("Too few tags available for "+erodeIterations+" erode iterations and starting with tag " + erosionFirstTag + " (erodeIterations+erosionFirstTag > 31)", active);
 					return;
 				}
 				if (erosionFirstTag <= 0) {
-					Debug.LogError("First erosion tag must be greater or equal to 1", active);
+					//Debug.LogError("First erosion tag must be greater or equal to 1", active);
 					return;
 				}
 			}

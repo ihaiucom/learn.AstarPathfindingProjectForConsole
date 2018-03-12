@@ -49,7 +49,7 @@ namespace Pathfinding.Legacy {
 
 			tr.position = pos + Vector3.up*(height*0.5f - center);
 
-			if (enableRotation && velocity != Vector3.zero) transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(velocity), Time.deltaTime * rotationSpeed * Mathf.Min(velocity.magnitude, 0.2f));
+		//	if (enableRotation && velocity != Vector3.zero) transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(velocity), Time.deltaTime * rotationSpeed * Mathf.Min(velocity.magnitude, 0.2f));
 		}
 	}
 }

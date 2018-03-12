@@ -24,7 +24,8 @@ using Thread = System.Threading.Thread;
  * \ingroup relevant
  */
 [HelpURL("http://arongranberg.com/astar/docs/class_astar_path.php")]
-public class AstarPath : VersionedMonoBehaviour {
+public class AstarPath : BehaviourBase
+{
 	/** The version number for the A* %Pathfinding Project */
 	public static System.Version Version {
 		get {
@@ -571,7 +572,7 @@ public class AstarPath : VersionedMonoBehaviour {
 	 */
 	private ushort nextFreePathID = 1;
 
-	private AstarPath () {
+    public  AstarPath () {
 		// Make sure that the pathProcessor is never null
 		pathProcessor = new PathProcessor(this, pathReturnQueue, 0, true);
 
@@ -611,13 +612,13 @@ public class AstarPath : VersionedMonoBehaviour {
 		if (active != null) {
 			return active.GetTagNames();
 		} else {
-			AstarPath astar = GameObject.FindObjectOfType<AstarPath>();
-			if (astar != null) {
-				active = astar;
-				return astar.GetTagNames();
-			} else {
+			//AstarPath astar = GameObject.FindObjectOfType<AstarPath>();
+			//if (astar != null) {
+			//	active = astar;
+			//	return astar.GetTagNames();
+			//} else {
 				return new string[1] { "There is no AstarPath component in the scene" };
-			}
+			//}
 		}
 	}
 
@@ -683,7 +684,7 @@ public class AstarPath : VersionedMonoBehaviour {
 	Pathfinding.Util.RetainedGizmos gizmos = new Pathfinding.Util.RetainedGizmos();
 
 	/** Calls OnDrawGizmos on graph generators */
-	private void OnDrawGizmos () {
+	public void OnDrawGizmos () {
 		// Make sure the singleton pattern holds
 		// Might not hold if the Awake method
 		// has not been called yet
@@ -784,7 +785,7 @@ public class AstarPath : VersionedMonoBehaviour {
 		}
 	}
 
-	/**
+    /**
 	 * Checks if any work items need to be executed
 	 * then runs pathfinding for a while (if not using multithreading because
 	 * then the calculation happens in other threads)
@@ -795,7 +796,7 @@ public class AstarPath : VersionedMonoBehaviour {
 	 * \see PathProcessor.TickNonMultithreaded
 	 * \see PathReturnQueue.ReturnPaths
 	 */
-	private void Update () {
+    public override void Update () {
 		// This class uses the [ExecuteInEditMode] attribute
 		// So Update is called even when not playing
 		// Don't do anything when not in play mode
@@ -955,7 +956,7 @@ public class AstarPath : VersionedMonoBehaviour {
 	 * \see \ref graph-updates
 	 */
 	public void UpdateGraphs (GraphUpdateObject ob, float delay) {
-		StartCoroutine(UpdateGraphsInteral(ob, delay));
+	//	this.eng .StartCoroutine(UpdateGraphsInteral(ob, delay));
 	}
 
 	/** Update all graphs using the GraphUpdateObject after \a delay seconds */
@@ -994,7 +995,7 @@ public class AstarPath : VersionedMonoBehaviour {
 		// If we should limit graph updates, start a coroutine which waits until we should update graphs
 		if (batchGraphUpdates && Time.realtimeSinceStartup-lastGraphUpdate < graphUpdateBatchingInterval) {
 			if (!graphUpdateRoutineRunning) {
-				StartCoroutine(DelayedGraphUpdate());
+              //  this.eng.StartCoroutine(DelayedGraphUpdate());
 			}
 		} else {
 			// Otherwise, graph updates should be carried out as soon as possible
@@ -1124,23 +1125,23 @@ public class AstarPath : VersionedMonoBehaviour {
 #endif
 	}
 
-	/** Sets up all needed variables and scans the graphs.
+    /** Sets up all needed variables and scans the graphs.
 	 * Calls Initialize, starts the ReturnPaths coroutine and scans all graphs.
 	 * Also starts threads if using multithreading
 	 * \see #OnAwakeSettings
 	 */
-	protected override void Awake () {
-		base.Awake();
+    public override void Awake () {
+		//base.Awake();
 		// Very important to set this. Ensures the singleton pattern holds
 		active = this;
 
-		if (FindObjectsOfType(typeof(AstarPath)).Length > 1) {
-			Debug.LogError("You should NOT have more than one AstarPath component in the scene at any time.\n" +
-				"This can cause serious errors since the AstarPath component builds around a singleton pattern.");
-		}
+        //if (FindObjectsOfType(typeof(AstarPath)).Length > 1) {
+        //	Debug.LogError("You should NOT have more than one AstarPath component in the scene at any time.\n" +
+        //		"This can cause serious errors since the AstarPath component builds around a singleton pattern.");
+        //}
 
-		// Disable GUILayout to gain some performance, it is not used in the OnGUI call
-		useGUILayout = false;
+        // Disable GUILayout to gain some performance, it is not used in the OnGUI call
+       // this.eng.useGUILayout = false;
 
 		// This class uses the [ExecuteInEditMode] attribute
 		// So Awake is called even when not playing
@@ -1264,15 +1265,15 @@ public class AstarPath : VersionedMonoBehaviour {
 		data.UpdateShortcuts();
 	}
 
-	/** Cleans up meshes to avoid memory leaks */
-	void OnDisable () {
+    /** Cleans up meshes to avoid memory leaks */
+    public override void OnDisable () {
 		gizmos.ClearCache();
 	}
 
-	/** Clears up variables and other stuff, destroys graphs.
+    /** Clears up variables and other stuff, destroys graphs.
 	 * Note that when destroying an AstarPath object, all static variables such as callbacks will be cleared.
 	 */
-	void OnDestroy () {
+    public override  void OnDestroy () {
 		// This class uses the [ExecuteInEditMode] attribute
 		// So OnDestroy is called even when not playing
 		// Don't do anything when not in play mode
@@ -1851,8 +1852,8 @@ public class AstarPath : VersionedMonoBehaviour {
 		}
 	}
 
-	/** Terminates pathfinding threads when the application quits */
-	void OnApplicationQuit () {
+    /** Terminates pathfinding threads when the application quits */
+    public override void OnApplicationQuit () {
 		OnDestroy();
 
 		// Abort threads if they are still running (likely because of some bug in that case)

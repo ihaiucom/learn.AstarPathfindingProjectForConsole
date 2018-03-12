@@ -14,7 +14,8 @@ using Pathfinding;
  */
 [AddComponentMenu("Pathfinding/Seeker")]
 [HelpURL("http://arongranberg.com/astar/docs/class_seeker.php")]
-public class Seeker : VersionedMonoBehaviour {
+public class Seeker : BehaviourBase
+{
 	/** Enables drawing of the last calculated path using Gizmos.
 	 * The path will show up in green.
 	 *
@@ -120,7 +121,7 @@ public class Seeker : VersionedMonoBehaviour {
 	}
 
 	/** Initializes a few variables */
-	protected override void Awake () {
+	public  override void Awake () {
 		base.Awake();
 		startEndModifier.Awake(this);
 	}
@@ -165,7 +166,7 @@ public class Seeker : VersionedMonoBehaviour {
 	 * \see ReleaseClaimedPath
 	 * \see startEndModifier
 	 */
-	public void OnDestroy () {
+	public override void OnDestroy () {
 		ReleaseClaimedPath();
 		startEndModifier.OnDestroy(this);
 	}
@@ -520,7 +521,7 @@ public class Seeker : VersionedMonoBehaviour {
 		}
 	}
 
-	protected override int OnUpgradeSerializedData (int version) {
+	protected  int OnUpgradeSerializedData (int version) {
 		if (version == 0 && traversableTagsCompatibility != null && traversableTagsCompatibility.tagsChange != -1) {
 			traversableTags = traversableTagsCompatibility.tagsChange;
 			traversableTagsCompatibility = new TagMask(-1, -1);

@@ -278,7 +278,7 @@ namespace Pathfinding.RVO {
 
 			MovementPlane movementPlane;
 			if (sim != null) movementPlane = sim.movementPlane;
-			else if (RVOSimulator.active) movementPlane = RVOSimulator.active.movementPlane;
+			else if (RVOSimulator.active!=null) movementPlane = RVOSimulator.active.movementPlane;
 			else movementPlane = MovementPlane.XZ;
 
 			if (movementPlane == MovementPlane.XY) {

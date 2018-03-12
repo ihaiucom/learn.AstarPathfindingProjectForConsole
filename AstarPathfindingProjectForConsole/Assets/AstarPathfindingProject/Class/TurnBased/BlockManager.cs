@@ -72,8 +72,8 @@ public class BlockManager : VersionedMonoBehaviour {
 	}
 
 	void Start () {
-		if (!AstarPath.active)
-			throw new System.Exception("No AstarPath object in the scene");
+		//if (!AstarPath.active)
+		//	throw new System.Exception("No AstarPath object in the scene");
 	}
 
 	/** True if the node contains any blocker which is included in the \a selector list */
