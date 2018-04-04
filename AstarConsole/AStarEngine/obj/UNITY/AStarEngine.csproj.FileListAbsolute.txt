@@ -1,0 +1,9 @@
+E:\AStar\dll\AStarEngine\obj\UNITY\AStarEngine.csprojResolveAssemblyReference.cache
+E:\AStar\dll\AStarEngine\bin\UNITY\AStarEngine.dll
+E:\AStar\dll\AStarEngine\bin\UNITY\AStarEngine.pdb
+E:\AStar\dll\AStarEngine\bin\UNITY\Pathfinding.ClipperLib.dll
+E:\AStar\dll\AStarEngine\bin\UNITY\Pathfinding.Ionic.Zip.Reduced.dll
+E:\AStar\dll\AStarEngine\bin\UNITY\Pathfinding.Poly2Tri.dll
+E:\AStar\dll\AStarEngine\bin\UNITY\UnityEngine.dll
+E:\AStar\dll\AStarEngine\obj\UNITY\AStarEngine.dll
+E:\AStar\dll\AStarEngine\obj\UNITY\AStarEngine.pdb

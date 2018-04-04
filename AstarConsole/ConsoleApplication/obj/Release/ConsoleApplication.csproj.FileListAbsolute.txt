@@ -1,0 +1,11 @@
+E:\AStar\dll\ConsoleApplication\obj\Release\ConsoleApplication.csprojResolveAssemblyReference.cache
+E:\AStar\dll\ConsoleApplication\bin\Release\ConsoleApplication.exe
+E:\AStar\dll\ConsoleApplication\bin\Release\ConsoleApplication.pdb
+E:\AStar\dll\ConsoleApplication\bin\Release\AStarEngine.dll
+E:\AStar\dll\ConsoleApplication\bin\Release\UnityEngine.dll
+E:\AStar\dll\ConsoleApplication\bin\Release\Pathfinding.Ionic.Zip.Reduced.dll
+E:\AStar\dll\ConsoleApplication\bin\Release\Pathfinding.ClipperLib.dll
+E:\AStar\dll\ConsoleApplication\bin\Release\Pathfinding.Poly2Tri.dll
+E:\AStar\dll\ConsoleApplication\bin\Release\AStarEngine.pdb
+E:\AStar\dll\ConsoleApplication\obj\Release\ConsoleApplication.exe
+E:\AStar\dll\ConsoleApplication\obj\Release\ConsoleApplication.pdb
