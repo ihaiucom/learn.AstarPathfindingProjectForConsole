@@ -8,10 +8,11 @@ using UnityEngine.Profiling;
 #endif
 
 namespace Pathfinding.Util {
-	using Pathfinding;
-	using Pathfinding.Poly2Tri;
+    using Pathfinding;
+    using Pathfinding.Poly2Tri;
+    using UnityEngine.Profiling;
 
-	/** Utility class for updating tiles of navmesh/recast graphs.
+    /** Utility class for updating tiles of navmesh/recast graphs.
 	 * Primarily used by the TileHandlerHelper for navmesh cutting.
 	 *
 	 * Most operations that this class does are asynchronous.
@@ -21,7 +22,7 @@ namespace Pathfinding.Util {
 	 *
 	 * \see TileHandlerHelper
 	 */
-	public class TileHandler {
+    public class TileHandler {
 		/** The underlaying graph which is handled by this instance */
 		public readonly NavmeshBase graph;
 

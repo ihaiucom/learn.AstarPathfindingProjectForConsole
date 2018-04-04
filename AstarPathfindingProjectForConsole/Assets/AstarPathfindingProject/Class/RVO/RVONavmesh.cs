@@ -56,14 +56,10 @@ namespace Pathfinding.RVO {
 			lastSim = rvosim.GetSimulator();
 
 			for (int i = 0; i < graphs.Length; i++) {
-				RecastGraph recast = graphs[i] as RecastGraph;
+				
 				INavmesh navmesh = graphs[i] as INavmesh;
 				GridGraph grid = graphs[i] as GridGraph;
-				if (recast != null) {
-					foreach (var tile in recast.GetTiles()) {
-						AddGraphObstacles(lastSim, tile);
-					}
-				} else if (navmesh != null) {
+				 if (navmesh != null) {
 					AddGraphObstacles(lastSim, navmesh);
 				} else if (grid != null) {
 					AddGraphObstacles(lastSim, grid);

@@ -35,7 +35,6 @@ namespace Pathfinding.Voxels {
 		/** The maximum slope that is considered walkable. [Limits: 0 <= value < 90] [Units: Degrees] */
 		public float maxSlope = 30;
 
-		public RecastGraph.RelevantGraphSurfaceMode relevantGraphSurfaceMode;
 
 		/** The world AABB to rasterize */
 		public Bounds forcedBounds;

@@ -86,7 +86,7 @@ namespace Pathfinding {
 		 * relavant output from this method again.
 		 */
 		public override bool RequiresUpdate () {
-			return (tr.position-lastPosition).sqrMagnitude > updateDistance*updateDistance || (useRotationAndScale && (Quaternion.Angle(lastRotation, tr.rotation) > updateRotationDistance));
+			return (tr.position-lastPosition).sqrMagnitude > updateDistance*updateDistance || (useRotationAndScale && (Quaternion.Angle(lastRotation, CustomHelp.CustomQuaternionToToUnity3D(tr.rotation)) > updateRotationDistance));
 		}
 
 		/** Forces this navmesh add to update the navmesh.
@@ -111,7 +111,7 @@ namespace Pathfinding {
 			lastPosition = tr.position;
 
 			if (useRotationAndScale) {
-				lastRotation = tr.rotation;
+				lastRotation = CustomHelp.CustomQuaternionToToUnity3D(tr.rotation);
 			}
 		}
 
@@ -202,7 +202,7 @@ namespace Pathfinding {
 			tbuffer = tris;
 
 			if (useRotationAndScale) {
-				Matrix4x4 m = Matrix4x4.TRS(tr.position + center, tr.rotation, tr.localScale * meshScale);
+				Matrix4x4 m = Matrix4x4.TRS(tr.position + center, CustomHelp.CustomQuaternionToToUnity3D(tr.rotation), tr.localScale * meshScale);
 
 				for (int i = 0; i < verts.Length; i++) {
 					var v = m.MultiplyPoint3x4(verts[i]);

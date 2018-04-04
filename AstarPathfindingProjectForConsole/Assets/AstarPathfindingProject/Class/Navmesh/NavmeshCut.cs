@@ -191,7 +191,7 @@ namespace Pathfinding {
 		protected override void OnEnable () {
 			base.OnEnable();
 			lastPosition = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
-			lastRotation = tr.rotation;
+			lastRotation = CustomHelp.CustomQuaternionToToUnity3D(tr.rotation);
 		}
 
 		/** Cached variable, to avoid allocations */
@@ -216,7 +216,7 @@ namespace Pathfinding {
 		 * relavant output from this method again.
 		 */
 		public override bool RequiresUpdate () {
-			return (tr.position-lastPosition).sqrMagnitude > updateDistance*updateDistance || (useRotationAndScale && (Quaternion.Angle(lastRotation, tr.rotation) > updateRotationDistance));
+			return (tr.position-lastPosition).sqrMagnitude > updateDistance*updateDistance || (useRotationAndScale && (Quaternion.Angle(lastRotation, CustomHelp.CustomQuaternionToToUnity3D(tr.rotation)) > updateRotationDistance));
 		}
 
 		/**
@@ -232,7 +232,7 @@ namespace Pathfinding {
 			lastPosition = tr.position;
 
 			if (useRotationAndScale) {
-				lastRotation = tr.rotation;
+				lastRotation = CustomHelp.CustomQuaternionToToUnity3D(tr.rotation);
 			}
 		}
 
@@ -396,7 +396,7 @@ namespace Pathfinding {
 			if (useRotationAndScale) {
 				var local2world = tr.localToWorldMatrix;
 				for (int i = 0; i < buffer.Count; i++) buffer[i] = local2world.MultiplyPoint3x4(buffer[i] + offset);
-				reverse ^= VectorMath.ReversesFaceOrientationsXZ(local2world);
+				//reverse ^= VectorMath.ReversesFaceOrientationsXZ(local2world);
 			} else {
 				offset += tr.position;
 				for (int i = 0; i < buffer.Count; i++) buffer[i] += offset;
@@ -440,7 +440,7 @@ namespace Pathfinding {
 			col.a *= 0.5f;
 			Gizmos.color = col;
 
-			var graph = AstarPath.active != null ? (AstarPath.active.data.recastGraph as NavmeshBase ?? AstarPath.active.data.navmesh) : null;
+			var graph = AstarPath.active != null ? ( AstarPath.active.data.navmesh) : null;
 			var transform = graph != null ? graph.transform : Pathfinding.Util.GraphTransform.identityTransform;
 			float ymid = GetY(transform);
 			float ymin = ymid - height*0.5f;

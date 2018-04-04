@@ -94,7 +94,7 @@ namespace Pathfinding.RVO
         public override void Awake()
         {
             base.Awake();
-            if (simulator == null && Application.isPlaying)
+            if (simulator == null)
             {
                 int threadCount = AstarPath.CalculateThreadCount(workerThreads);
                 simulator = new Pathfinding.RVO.Simulator(threadCount, doubleBuffering, movementPlane);
@@ -104,7 +104,6 @@ namespace Pathfinding.RVO
         /** Update the simulation */
         public override void Update()
         {
-            if (!Application.isPlaying) return;
 
             if (desiredSimulationFPS < 1) desiredSimulationFPS = 1;
 

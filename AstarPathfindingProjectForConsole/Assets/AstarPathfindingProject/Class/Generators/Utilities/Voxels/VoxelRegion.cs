@@ -896,12 +896,7 @@ namespace Pathfinding.Voxels {
 		public void FilterSmallRegions (ushort[] reg, int minRegionSize, int maxRegions) {
 			RelevantGraphSurface c = RelevantGraphSurface.Root;
 			// Need to use ReferenceEquals because it might be called from another thread
-			bool anySurfaces = !RelevantGraphSurface.ReferenceEquals(c, null) && (relevantGraphSurfaceMode != RecastGraph.RelevantGraphSurfaceMode.DoNotRequire);
-
-			// Nothing to do here
-			if (!anySurfaces && minRegionSize <= 0) {
-				return;
-			}
+		
 
 			int[] counter = new int[maxRegions];
 
@@ -923,35 +918,6 @@ namespace Pathfinding.Voxels {
 
 			// Mark RelevantGraphSurfaces
 
-			// If they can also be adjacent to tile borders, this will also include the BorderBit
-			int RelevantSurfaceCheck = RelevantSurfaceSet | ((relevantGraphSurfaceMode == RecastGraph.RelevantGraphSurfaceMode.OnlyForCompletelyInsideTile) ? BorderBit : 0x0);
-
-			if (anySurfaces) {
-				// Need to use ReferenceEquals because it might be called from another thread
-				while (!RelevantGraphSurface.ReferenceEquals(c, null)) {
-					int x, z;
-					this.VectorToIndex(c.Position, out x, out z);
-
-					// Out of bounds
-					if (x < 0 || z < 0 || x >= voxelArea.width || z >= voxelArea.depth) {
-						c = c.Next;
-						continue;
-					}
-
-					int y = (int)((c.Position.y - voxelOffset.y)/cellHeight);
-					int rad = (int)(c.maxRange / cellHeight);
-
-					CompactVoxelCell cell = voxelArea.compactCells[x+z*voxelArea.width];
-					for (int i = (int)cell.index; i < cell.index+cell.count; i++) {
-						CompactVoxelSpan s = voxelArea.compactSpans[i];
-						if (System.Math.Abs(s.y - y) <= rad && reg[i] != 0) {
-							bits[union_find_find(counter, (int)reg[i] & ~BorderReg)] |= RelevantSurfaceSet;
-						}
-					}
-
-					c = c.Next;
-				}
-			}
 
 			for (int z = 0, pz = 0; z < wd; z += voxelArea.width, pz++) {
 				for (int x = 0; x < voxelArea.width; x++) {
@@ -1008,7 +974,7 @@ namespace Pathfinding.Voxels {
 
 				// Not in any relevant surface
 				// or it is adjacent to a border (see RelevantSurfaceCheck)
-				if (anySurfaces && (bits[ctr] & RelevantSurfaceCheck) == 0) counter[ctr] = -1;
+			
 			}
 
 			for (int i = 0; i < voxelArea.compactSpanCount; i++) {

@@ -239,7 +239,7 @@ namespace Pathfinding.Util {
 		public GraphGizmoHelper GetSingleFrameGizmoHelper (AstarPath active) {
 			var uniqHash = new RetainedGizmos.Hasher();
 
-			uniqHash.AddHash(Time.realtimeSinceStartup.GetHashCode());
+			//uniqHash.AddHash(Time.realtimeSinceStartup.GetHashCode());
 			Draw(uniqHash);
 			return GetGizmoHelper(active, uniqHash);
 		}
@@ -313,7 +313,7 @@ namespace Pathfinding.Util {
 					mat.SetPass(pass);
 					for (int i = 0; i < meshes.Count; i++) {
 						if (meshes[i].lines == (mat == lineMaterial) && GeometryUtility.TestPlanesAABB(planes, meshes[i].mesh.bounds)) {
-							Graphics.DrawMeshNow(meshes[i].mesh, Matrix4x4.identity);
+							//Graphics.DrawMeshNow(meshes[i].mesh, Matrix4x4.identity);
 						}
 					}
 				}
