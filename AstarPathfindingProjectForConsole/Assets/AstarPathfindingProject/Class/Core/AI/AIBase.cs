@@ -147,7 +147,7 @@ namespace Pathfinding
         protected void Move(Vector3 position3D, Vector3 deltaPosition)
         {
             bool positionDirty = false;
-            Debug.Log(position3D);
+
             {
                 // Use Transform, Rigidbody or Rigidbody2D
                 float lastElevation;
@@ -187,6 +187,7 @@ namespace Pathfinding
             {
                 // Note that rigid.MovePosition may or may not move the character immediately.
                 // Check the Unity documentation for the special cases.
+                Debug.Log(position3D);
                 transform.position = position3D;
             }
         }

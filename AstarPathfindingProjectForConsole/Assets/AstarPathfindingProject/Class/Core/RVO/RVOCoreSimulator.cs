@@ -687,67 +687,77 @@ namespace Pathfinding.RVO {
 
 		/** Should be called once per frame */
 		public void Update () {
-			// Initialize last step
-			if (lastStep < 0) {
-				lastStep = Time.time;
-				deltaTime = DesiredDeltaTime;
-			}
+            // Initialize last step
+            if (lastStep < 0)
+            {
+                lastStep = Time.time;
+                deltaTime = DesiredDeltaTime;
+            }
 
-			if (Time.time - lastStep >= DesiredDeltaTime) {
-				deltaTime = Time.time - lastStep;
-				lastStep = Time.time;
+            if (Time.time - lastStep >= DesiredDeltaTime)
+            {
+                deltaTime = Time.time - lastStep;
+                lastStep = Time.time;
 
-				// Prevent a zero delta time
-				deltaTime = System.Math.Max(deltaTime, 1.0f/2000f);
+                // Prevent a zero delta time
+                deltaTime = System.Math.Max(deltaTime, 1.0f / 2000f);
 
-				if (Multithreading) {
-					// Make sure the threads have completed their tasks
-					// Otherwise block until they have
-					if (doubleBuffering) {
-						for (int i = 0; i < workers.Length; i++) workers[i].WaitOne();
-						for (int i = 0; i < agents.Count; i++) agents[i].PostCalculation();
-					}
+                if (Multithreading)
+                {
+                    // Make sure the threads have completed their tasks
+                    // Otherwise block until they have
+                    if (doubleBuffering)
+                    {
+                        for (int i = 0; i < workers.Length; i++) workers[i].WaitOne();
+                        for (int i = 0; i < agents.Count; i++) agents[i].PostCalculation();
+                    }
 
-					PreCalculation();
-					CleanAndUpdateObstaclesIfNecessary();
-					BuildQuadtree();
+                    PreCalculation();
+                    CleanAndUpdateObstaclesIfNecessary();
+                    BuildQuadtree();
 
-					for (int i = 0; i < workers.Length; i++) {
-						workers[i].start = i*agents.Count / workers.Length;
-						workers[i].end = (i+1)*agents.Count / workers.Length;
-					}
+                    for (int i = 0; i < workers.Length; i++)
+                    {
+                        workers[i].start = i * agents.Count / workers.Length;
+                        workers[i].end = (i + 1) * agents.Count / workers.Length;
+                    }
 
-					// BufferSwitch
-					for (int i = 0; i < workers.Length; i++) workers[i].Execute(1);
-					for (int i = 0; i < workers.Length; i++) workers[i].WaitOne();
+                    // BufferSwitch
+                    for (int i = 0; i < workers.Length; i++) workers[i].Execute(1);
+                    for (int i = 0; i < workers.Length; i++) workers[i].WaitOne();
 
-					// Calculate New Velocity
-					for (int i = 0; i < workers.Length; i++) workers[i].Execute(0);
+                    // Calculate New Velocity
+                    for (int i = 0; i < workers.Length; i++) workers[i].Execute(0);
 
-					// Make sure the threads have completed their tasks
-					// Otherwise block until they have
-					if (!doubleBuffering) {
-						for (int i = 0; i < workers.Length; i++) workers[i].WaitOne();
-						for (int i = 0; i < agents.Count; i++) agents[i].PostCalculation();
-					}
-				} else {
-					PreCalculation();
-					CleanAndUpdateObstaclesIfNecessary();
-					BuildQuadtree();
+                    // Make sure the threads have completed their tasks
+                    // Otherwise block until they have
+                    if (!doubleBuffering)
+                    {
+                        for (int i = 0; i < workers.Length; i++) workers[i].WaitOne();
+                        for (int i = 0; i < agents.Count; i++) agents[i].PostCalculation();
+                    }
+                }
+                else
+                {
+                    PreCalculation();
+                    CleanAndUpdateObstaclesIfNecessary();
+                    BuildQuadtree();
 
-					for (int i = 0; i < agents.Count; i++) {
-						agents[i].BufferSwitch();
-					}
+                    for (int i = 0; i < agents.Count; i++)
+                    {
+                        agents[i].BufferSwitch();
+                    }
 
-					for (int i = 0; i < agents.Count; i++) {
-						agents[i].CalculateNeighbours();
-						agents[i].CalculateVelocity(coroutineWorkerContext);
-					}
+                    for (int i = 0; i < agents.Count; i++)
+                    {
+                        agents[i].CalculateNeighbours();
+                        agents[i].CalculateVelocity(coroutineWorkerContext);
+                    }
 
-					for (int i = 0; i < agents.Count; i++) agents[i].PostCalculation();
-				}
-			}
-		}
+                    for (int i = 0; i < agents.Count; i++) agents[i].PostCalculation();
+                }
+            }
+        }
 
 		internal class WorkerContext {
 			public Agent.VOBuffer vos = new Agent.VOBuffer(16);

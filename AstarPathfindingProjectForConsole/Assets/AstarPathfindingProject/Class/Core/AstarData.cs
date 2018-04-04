@@ -53,7 +53,6 @@ namespace Pathfinding {
 		 * Updated at scanning time.
 		 * \astarpro
 		 */
-		public RecastGraph recastGraph { get; private set; }
 
 		/** All supported graph types.
 		 * Populated through reflection search
@@ -123,10 +122,6 @@ namespace Pathfinding {
 		 */
 		public byte[] data_backup;
 
-		/** Serialized data for cached startup.
-		 * If set, on start the graphs will be deserialized from this file.
-		 */
-		public TextAsset file_cachedStartup;
 
 		/** Serialized data for cached startup.
 		 *
@@ -159,7 +154,7 @@ namespace Pathfinding {
 		public void Awake () {
 			graphs = new NavGraph[0];
 
-			if (cacheStartup && file_cachedStartup != null) {
+			if (cacheStartup && data_cachedStartup != null) {
 				LoadFromCache();
 			} else {
 				DeserializeGraphs();
@@ -224,18 +219,16 @@ namespace Pathfinding {
 			pointGraph = (PointGraph)FindGraphOfType(typeof(PointGraph));
 #endif
 
-			recastGraph = (RecastGraph)FindGraphOfType(typeof(RecastGraph));
 		}
 
 		/** Load from data from #file_cachedStartup */
 		public void LoadFromCache () {
 			var graphLock = AssertSafe();
 
-			if (file_cachedStartup != null) {
-				var bytes = file_cachedStartup.bytes;
-				DeserializeGraphs(bytes);
+			if (data_cachedStartup != null) {
+				DeserializeGraphs(data_cachedStartup);
 
-				GraphModifier.TriggerEvent(GraphModifier.EventType.PostCacheLoad);
+				//GraphModifier.TriggerEvent(GraphModifier.EventType.PostCacheLoad);
 			} else {
 				Debug.LogError("Can't load from cache since the cache is empty");
 			}

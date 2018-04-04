@@ -222,10 +222,10 @@ public class Seeker : BehaviourBase
 		// Loop through all modifiers and apply post processing
 		for (int i = 0; i < modifiers.Count; i++) {
 			// Cast to MonoModifier, i.e modifiers attached as scripts to the game object
-			var mMod = modifiers[i] as MonoModifier;
+			//var mMod = modifiers[i] as MonoModifier;
 
-			// Ignore modifiers which are not enabled
-			if (mMod != null && !mMod.enabled) continue;
+			//// Ignore modifiers which are not enabled
+			//if (mMod != null && !mMod.enabled) continue;
 
 			if (pass == ModifierPass.PreProcess) {
 				modifiers[i].PreProcess(p);

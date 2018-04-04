@@ -175,28 +175,29 @@ namespace Pathfinding {
 		 * run matrix multiplications.
 		 */
 		public Bounds GetBounds () {
-			if (points == null || points.Length == 0) {
-				Bounds bounds;
-				var coll = GetComponent<Collider>();
-				var coll2D = GetComponent<Collider2D>();
-				var rend = GetComponent<Renderer>();
+            //if (points == null || points.Length == 0) {
+            //	Bounds bounds;
+            //	var coll = GetComponent<Collider>();
+            //	var coll2D = GetComponent<Collider2D>();
+            //	var rend = GetComponent<Renderer>();
 
-				if (coll != null) bounds = coll.bounds;
-				else if (coll2D != null) {
-					bounds = coll2D.bounds;
-					bounds.size = new Vector3(bounds.size.x, bounds.size.y, Mathf.Max(bounds.size.z, 1f));
-				} else if (rend != null) {
-					bounds = rend.bounds;
-				} else {
-					return new Bounds(Vector3.zero, Vector3.zero);
-				}
+            //	if (coll != null) bounds = coll.bounds;
+            //	else if (coll2D != null) {
+            //		bounds = coll2D.bounds;
+            //		bounds.size = new Vector3(bounds.size.x, bounds.size.y, Mathf.Max(bounds.size.z, 1f));
+            //	} else if (rend != null) {
+            //		bounds = rend.bounds;
+            //	} else {
+            //		return new Bounds(Vector3.zero, Vector3.zero);
+            //	}
 
-				if (legacyMode && bounds.size.y < minBoundsHeight) bounds.size = new Vector3(bounds.size.x, minBoundsHeight, bounds.size.z);
-				return bounds;
-			} else {
-				return GraphUpdateShape.GetBounds(convex ? convexPoints : points, legacyMode && legacyUseWorldSpace ? Matrix4x4.identity : transform.localToWorldMatrix, minBoundsHeight);
-			}
-		}
+            //	if (legacyMode && bounds.size.y < minBoundsHeight) bounds.size = new Vector3(bounds.size.x, minBoundsHeight, bounds.size.z);
+            //	return bounds;
+            //} else {
+            //	return GraphUpdateShape.GetBounds(convex ? convexPoints : points, legacyMode && legacyUseWorldSpace ? Matrix4x4.identity : transform.localToWorldMatrix, minBoundsHeight);
+            //}
+            return new Bounds();
+        }
 
 		/** Updates graphs with a created GUO.
 		 * Creates a Pathfinding.GraphUpdateObject with a Pathfinding.GraphUpdateShape
@@ -204,64 +205,64 @@ namespace Pathfinding {
 		 * This will not update graphs immediately. See AstarPath.UpdateGraph for more info.
 		 */
 		public void Apply () {
-			if (AstarPath.active == null) {
-				Debug.LogError("There is no AstarPath object in the scene", this);
-				return;
-			}
+			//if (AstarPath.active == null) {
+			//	Debug.LogError("There is no AstarPath object in the scene", this);
+			//	return;
+			//}
 
-			GraphUpdateObject guo;
+			//GraphUpdateObject guo;
 
-			if (points == null || points.Length == 0) {
-				var polygonCollider = GetComponent<PolygonCollider2D>();
-				if (polygonCollider != null) {
-					var points2D = polygonCollider.points;
-					Vector3[] pts = new Vector3[points2D.Length];
-					for (int i = 0; i < pts.Length; i++) {
-						var p = points2D[i] + polygonCollider.offset;
-						pts[i] = new Vector3(p.x, 0, p.y);
-					}
+			//if (points == null || points.Length == 0) {
+			//	var polygonCollider = GetComponent<PolygonCollider2D>();
+			//	if (polygonCollider != null) {
+			//		var points2D = polygonCollider.points;
+			//		Vector3[] pts = new Vector3[points2D.Length];
+			//		for (int i = 0; i < pts.Length; i++) {
+			//			var p = points2D[i] + polygonCollider.offset;
+			//			pts[i] = new Vector3(p.x, 0, p.y);
+			//		}
 
-					var mat = transform.localToWorldMatrix * Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(-90, 0, 0), Vector3.one);
-					var shape = new GraphUpdateShape(points, convex, mat, minBoundsHeight);
-					guo = new GraphUpdateObject(GetBounds());
-					guo.shape = shape;
-				} else {
-					var bounds = GetBounds();
-					if (bounds.center == Vector3.zero && bounds.size == Vector3.zero) {
-						Debug.LogError("Cannot apply GraphUpdateScene, no points defined and no renderer or collider attached", this);
-						return;
-					}
+			//		var mat = transform.localToWorldMatrix * Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(-90, 0, 0), Vector3.one);
+			//		var shape = new GraphUpdateShape(points, convex, mat, minBoundsHeight);
+			//		guo = new GraphUpdateObject(GetBounds());
+			//		guo.shape = shape;
+			//	} else {
+			//		var bounds = GetBounds();
+			//		if (bounds.center == Vector3.zero && bounds.size == Vector3.zero) {
+			//			Debug.LogError("Cannot apply GraphUpdateScene, no points defined and no renderer or collider attached", this);
+			//			return;
+			//		}
 
-					guo = new GraphUpdateObject(bounds);
-				}
-			} else {
-				GraphUpdateShape shape;
-				if (legacyMode && !legacyUseWorldSpace) {
-					// Used for compatibility with older versions
-					var worldPoints = new Vector3[points.Length];
-					for (int i = 0; i < points.Length; i++) worldPoints[i] = transform.TransformPoint(points[i]);
-					shape = new GraphUpdateShape(worldPoints, convex, Matrix4x4.identity, minBoundsHeight);
-				} else {
-					shape = new GraphUpdateShape(points, convex, legacyMode && legacyUseWorldSpace ? Matrix4x4.identity : transform.localToWorldMatrix, minBoundsHeight);
-				}
-				var bounds = shape.GetBounds();
-				guo = new GraphUpdateObject(bounds);
-				guo.shape = shape;
-			}
+			//		guo = new GraphUpdateObject(bounds);
+			//	}
+			//} else {
+			//	GraphUpdateShape shape;
+			//	if (legacyMode && !legacyUseWorldSpace) {
+			//		// Used for compatibility with older versions
+			//		var worldPoints = new Vector3[points.Length];
+			//		for (int i = 0; i < points.Length; i++) worldPoints[i] = transform.TransformPoint(points[i]);
+			//		shape = new GraphUpdateShape(worldPoints, convex, Matrix4x4.identity, minBoundsHeight);
+			//	} else {
+			//		shape = new GraphUpdateShape(points, convex, legacyMode && legacyUseWorldSpace ? Matrix4x4.identity : transform.localToWorldMatrix, minBoundsHeight);
+			//	}
+			//	var bounds = shape.GetBounds();
+			//	guo = new GraphUpdateObject(bounds);
+			//	guo.shape = shape;
+			//}
 
-			firstApplied = true;
+			//firstApplied = true;
 
-			guo.modifyWalkability = modifyWalkability;
-			guo.setWalkability = setWalkability;
-			guo.addPenalty = penaltyDelta;
-			guo.updatePhysics = updatePhysics;
-			guo.updateErosion = updateErosion;
-			guo.resetPenaltyOnPhysics = resetPenaltyOnPhysics;
+			//guo.modifyWalkability = modifyWalkability;
+			//guo.setWalkability = setWalkability;
+			//guo.addPenalty = penaltyDelta;
+			//guo.updatePhysics = updatePhysics;
+			//guo.updateErosion = updateErosion;
+			//guo.resetPenaltyOnPhysics = resetPenaltyOnPhysics;
 
-			guo.modifyTag = modifyTag;
-			guo.setTag = setTag;
+			//guo.modifyTag = modifyTag;
+			//guo.setTag = setTag;
 
-			AstarPath.active.UpdateGraphs(guo);
+			//AstarPath.active.UpdateGraphs(guo);
 		}
 
 		/** Draws some gizmos */
@@ -276,72 +277,72 @@ namespace Pathfinding {
 
 		/** Draws some gizmos */
 		void OnDrawGizmos (bool selected) {
-			Color c = selected ? new Color(227/255f, 61/255f, 22/255f, 1.0f) : new Color(227/255f, 61/255f, 22/255f, 0.9f);
+			//Color c = selected ? new Color(227/255f, 61/255f, 22/255f, 1.0f) : new Color(227/255f, 61/255f, 22/255f, 0.9f);
 
-			if (selected) {
-				Gizmos.color = Color.Lerp(c, new Color(1, 1, 1, 0.2f), 0.9f);
+			//if (selected) {
+			//	Gizmos.color = Color.Lerp(c, new Color(1, 1, 1, 0.2f), 0.9f);
 
-				Bounds b = GetBounds();
-				Gizmos.DrawCube(b.center, b.size);
-				Gizmos.DrawWireCube(b.center, b.size);
-			}
+			//	Bounds b = GetBounds();
+			//	Gizmos.DrawCube(b.center, b.size);
+			//	Gizmos.DrawWireCube(b.center, b.size);
+			//}
 
-			if (points == null) return;
+			//if (points == null) return;
 
-			if (convex) c.a *= 0.5f;
+			//if (convex) c.a *= 0.5f;
 
-			Gizmos.color = c;
+			//Gizmos.color = c;
 
-			Matrix4x4 matrix = legacyMode && legacyUseWorldSpace ? Matrix4x4.identity : transform.localToWorldMatrix;
+			//Matrix4x4 matrix = legacyMode && legacyUseWorldSpace ? Matrix4x4.identity : transform.localToWorldMatrix;
 
-			if (convex) {
-				c.r -= 0.1f;
-				c.g -= 0.2f;
-				c.b -= 0.1f;
+			//if (convex) {
+			//	c.r -= 0.1f;
+			//	c.g -= 0.2f;
+			//	c.b -= 0.1f;
 
-				Gizmos.color = c;
-			}
+			//	Gizmos.color = c;
+			//}
 
-			if (selected || !convex) {
-				for (int i = 0; i < points.Length; i++) {
-					Gizmos.DrawLine(matrix.MultiplyPoint3x4(points[i]), matrix.MultiplyPoint3x4(points[(i+1)%points.Length]));
-				}
-			}
+			//if (selected || !convex) {
+			//	for (int i = 0; i < points.Length; i++) {
+			//		Gizmos.DrawLine(matrix.MultiplyPoint3x4(points[i]), matrix.MultiplyPoint3x4(points[(i+1)%points.Length]));
+			//	}
+			//}
 
-			if (convex) {
-				if (convexPoints == null) RecalcConvex();
+			//if (convex) {
+			//	if (convexPoints == null) RecalcConvex();
 
-				Gizmos.color = selected ? new Color(227/255f, 61/255f, 22/255f, 1.0f) : new Color(227/255f, 61/255f, 22/255f, 0.9f);
+			//	Gizmos.color = selected ? new Color(227/255f, 61/255f, 22/255f, 1.0f) : new Color(227/255f, 61/255f, 22/255f, 0.9f);
 
-				for (int i = 0; i < convexPoints.Length; i++) {
-					Gizmos.DrawLine(matrix.MultiplyPoint3x4(convexPoints[i]), matrix.MultiplyPoint3x4(convexPoints[(i+1)%convexPoints.Length]));
-				}
-			}
+			//	for (int i = 0; i < convexPoints.Length; i++) {
+			//		Gizmos.DrawLine(matrix.MultiplyPoint3x4(convexPoints[i]), matrix.MultiplyPoint3x4(convexPoints[(i+1)%convexPoints.Length]));
+			//	}
+			//}
 
-			// Draw the full 3D shape
-			var pts = convex ? convexPoints : points;
-			if (selected && pts != null && pts.Length > 0) {
-				Gizmos.color = new Color(1, 1, 1, 0.2f);
-				float miny = pts[0].y, maxy = pts[0].y;
-				for (int i = 0; i < pts.Length; i++) {
-					miny = Mathf.Min(miny, pts[i].y);
-					maxy = Mathf.Max(maxy, pts[i].y);
-				}
-				var extraHeight = Mathf.Max(minBoundsHeight - (maxy - miny), 0) * 0.5f;
-				miny -= extraHeight;
-				maxy += extraHeight;
+			//// Draw the full 3D shape
+			//var pts = convex ? convexPoints : points;
+			//if (selected && pts != null && pts.Length > 0) {
+			//	Gizmos.color = new Color(1, 1, 1, 0.2f);
+			//	float miny = pts[0].y, maxy = pts[0].y;
+			//	for (int i = 0; i < pts.Length; i++) {
+			//		miny = Mathf.Min(miny, pts[i].y);
+			//		maxy = Mathf.Max(maxy, pts[i].y);
+			//	}
+			//	var extraHeight = Mathf.Max(minBoundsHeight - (maxy - miny), 0) * 0.5f;
+			//	miny -= extraHeight;
+			//	maxy += extraHeight;
 
-				for (int i = 0; i < pts.Length; i++) {
-					var next = (i+1) % pts.Length;
-					var p1 = matrix.MultiplyPoint3x4(pts[i] + Vector3.up*(miny - pts[i].y));
-					var p2 = matrix.MultiplyPoint3x4(pts[i] + Vector3.up*(maxy - pts[i].y));
-					var p1n = matrix.MultiplyPoint3x4(pts[next] + Vector3.up*(miny - pts[next].y));
-					var p2n = matrix.MultiplyPoint3x4(pts[next] + Vector3.up*(maxy - pts[next].y));
-					Gizmos.DrawLine(p1, p2);
-					Gizmos.DrawLine(p1, p1n);
-					Gizmos.DrawLine(p2, p2n);
-				}
-			}
+			//	for (int i = 0; i < pts.Length; i++) {
+			//		var next = (i+1) % pts.Length;
+			//		var p1 = matrix.MultiplyPoint3x4(pts[i] + Vector3.up*(miny - pts[i].y));
+			//		var p2 = matrix.MultiplyPoint3x4(pts[i] + Vector3.up*(maxy - pts[i].y));
+			//		var p1n = matrix.MultiplyPoint3x4(pts[next] + Vector3.up*(miny - pts[next].y));
+			//		var p2n = matrix.MultiplyPoint3x4(pts[next] + Vector3.up*(maxy - pts[next].y));
+			//		Gizmos.DrawLine(p1, p2);
+			//		Gizmos.DrawLine(p1, p1n);
+			//		Gizmos.DrawLine(p2, p2n);
+			//	}
+			//}
 		}
 
 		/** Disables legacy mode if it is enabled.

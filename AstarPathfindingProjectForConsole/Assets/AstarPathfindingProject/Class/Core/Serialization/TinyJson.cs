@@ -260,63 +260,74 @@ namespace Pathfinding.Serialization {
 		}
 
 		UnityEngine.Object DeserializeUnityObjectInner () {
-			// Ignore InstanceID field (compatibility only)
-			var fieldName = EatField();
+            // Ignore InstanceID field (compatibility only)
+            var fieldName = EatField();
 
-			if (fieldName == "InstanceID") {
-				EatField();
-				fieldName = EatField();
-			}
+            if (fieldName == "InstanceID")
+            {
+                EatField();
+                fieldName = EatField();
+            }
 
-			if (fieldName != "Name") throw new Exception("Expected 'Name' field");
-			string name = EatField();
+            if (fieldName != "Name") throw new Exception("Expected 'Name' field");
+            string name = EatField();
 
-			if (name == null) return null;
+            if (name == null) return null;
 
-			if (EatField() != "Type") throw new Exception("Expected 'Type' field");
-			string typename = EatField();
+            if (EatField() != "Type") throw new Exception("Expected 'Type' field");
+            string typename = EatField();
 
-			// Remove assembly information
-			if (typename.IndexOf(',') != -1) {
-				typename = typename.Substring(0, typename.IndexOf(','));
-			}
+            // Remove assembly information
+            if (typename.IndexOf(',') != -1)
+            {
+                typename = typename.Substring(0, typename.IndexOf(','));
+            }
 
-			// Note calling through assembly is more stable on e.g WebGL
-			var type = WindowsStoreCompatibility.GetTypeInfo(typeof(AstarPath)).Assembly.GetType(typename);
-			type = type ?? WindowsStoreCompatibility.GetTypeInfo(typeof(Transform)).Assembly.GetType(typename);
+            // Note calling through assembly is more stable on e.g WebGL
+            var type = WindowsStoreCompatibility.GetTypeInfo(typeof(AstarPath)).Assembly.GetType(typename);
+            type = type ?? WindowsStoreCompatibility.GetTypeInfo(typeof(Transform)).Assembly.GetType(typename);
 
-			if (Type.Equals(type, null)) {
-				Debug.LogError("Could not find type '"+typename+"'. Cannot deserialize Unity reference");
-				return null;
-			}
+            if (Type.Equals(type, null))
+            {
+                Debug.LogError("Could not find type '" + typename + "'. Cannot deserialize Unity reference");
+                return null;
+            }
 
-			// Check if there is another field there
-			EatWhitespace();
-			if ((char)reader.Peek() == '"') {
-				if (EatField() != "GUID") throw new Exception("Expected 'GUID' field");
-				string guid = EatField();
+            // Check if there is another field there
+            EatWhitespace();
+            if ((char)reader.Peek() == '"')
+            {
+                if (EatField() != "GUID") throw new Exception("Expected 'GUID' field");
+                string guid = EatField();
 
-				foreach (var helper in UnityEngine.Object.FindObjectsOfType<UnityReferenceHelper>()) {
-					if (helper.GetGUID() == guid) {
-						if (Type.Equals(type, typeof(GameObject))) {
-							return helper.gameObject;
-						} else {
-							return helper.GetComponent(type);
-						}
-					}
-				}
-			}
+                foreach (var helper in UnityEngine.Object.FindObjectsOfType<UnityReferenceHelper>())
+                {
+                    if (helper.GetGUID() == guid)
+                    {
+                        //if (Type.Equals(type, typeof(GameObject)))
+                        //{
+                        //    return helper.gameObject;
+                        //}
+                        //else
+                        {
+                            return helper.GetComponent(type);
+                        }
+                    }
+                }
+            }
 
-			// Try to load from resources
-			UnityEngine.Object[] objs = Resources.LoadAll(name, type);
+            // Try to load from resources
+            //UnityEngine.Object[] objs = Resources.LoadAll(name, type);
 
-			for (int i = 0; i < objs.Length; i++) {
-				if (objs[i].name == name || objs.Length == 1) {
-					return objs[i];
-				}
-			}
+            //for (int i = 0; i < objs.Length; i++)
+            //{
+            //    if (objs[i].name == name || objs.Length == 1)
+            //    {
+            //        return objs[i];
+            //    }
+            //}
 
-			return null;
+            return null;
 		}
 
 		void EatWhitespace () {

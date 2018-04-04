@@ -326,10 +326,10 @@ public class AILerp : VersionedMonoBehaviour {
 					euler.z = Mathf.LerpAngle(euler.z, angle, Time.deltaTime * rotationSpeed);
 					tr.eulerAngles = euler;
 				} else {
-					Quaternion rot = tr.rotation;
+					Quaternion rot = CustomHelp.CustomQuaternionToToUnity3D(tr.rotation);
 					Quaternion desiredRot = Quaternion.LookRotation(direction);
 
-					tr.rotation = Quaternion.Slerp(rot, desiredRot, Time.deltaTime * rotationSpeed);
+					tr.rotation = CustomHelp.CustomQuaternionToToUnity3D(Quaternion.Slerp(rot, desiredRot, Time.deltaTime * rotationSpeed));
 				}
 			}
 

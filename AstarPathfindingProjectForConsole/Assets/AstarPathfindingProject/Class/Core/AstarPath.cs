@@ -12,8 +12,6 @@ using Thread = Pathfinding.WindowsStore.Thread;
 using Thread = System.Threading.Thread;
 #endif
 
-[ExecuteInEditMode]
-[AddComponentMenu("Pathfinding/Pathfinder")]
 /**
  * Core component for the A* Pathfinding System.
  * This class handles all of the pathfinding system, calculates all paths and stores the info.\n
@@ -800,7 +798,7 @@ public class AstarPath : BehaviourBase
 		// This class uses the [ExecuteInEditMode] attribute
 		// So Update is called even when not playing
 		// Don't do anything when not in play mode
-		if (!Application.isPlaying) return;
+		
 
 		// Execute blocking actions such as graph updates
 		// when not scanning
@@ -1083,46 +1081,40 @@ public class AstarPath : BehaviourBase
 	 * When running on WebGL this method always returns 0
 	 */
 	public static int CalculateThreadCount (ThreadCount count) {
-#if UNITY_WEBGL
-		return 0;
-#else
-		if (count == ThreadCount.AutomaticLowLoad || count == ThreadCount.AutomaticHighLoad) {
-#if ASTARDEBUG
-			Debug.Log(SystemInfo.systemMemorySize + " " + SystemInfo.processorCount + " " + SystemInfo.processorType);
-#endif
 
-			int logicalCores = Mathf.Max(1, SystemInfo.processorCount);
-			int memory = SystemInfo.systemMemorySize;
+		//if (count == ThreadCount.AutomaticLowLoad || count == ThreadCount.AutomaticHighLoad) {
 
-			if (memory <= 0) {
-				Debug.LogError("Machine reporting that is has <= 0 bytes of RAM. This is definitely not true, assuming 1 GiB");
-				memory = 1024;
-			}
+		//	int logicalCores = Mathf.Max(1, SystemInfo.processorCount);
+		//	int memory = SystemInfo.systemMemorySize;
 
-			if (logicalCores <= 1) return 0;
+		//	if (memory <= 0) {
+		//		Debug.LogError("Machine reporting that is has <= 0 bytes of RAM. This is definitely not true, assuming 1 GiB");
+		//		memory = 1024;
+		//	}
 
-			if (memory <= 512) return 0;
+		//	if (logicalCores <= 1) return 0;
 
-			if (count == ThreadCount.AutomaticHighLoad) {
-				if (memory <= 1024) logicalCores = System.Math.Min(logicalCores, 2);
-			} else {
-				//Always run at at most processorCount-1 threads (one core reserved for unity thread).
-				// Many computers use hyperthreading, so dividing by two is used to remove the hyperthreading cores, pathfinding
-				// doesn't scale well past the number of physical cores anyway
-				logicalCores /= 2;
-				logicalCores = Mathf.Max(1, logicalCores);
+		//	if (memory <= 512) return 0;
 
-				if (memory <= 1024) logicalCores = System.Math.Min(logicalCores, 2);
+		//	if (count == ThreadCount.AutomaticHighLoad) {
+		//		if (memory <= 1024) logicalCores = System.Math.Min(logicalCores, 2);
+		//	} else {
+		//		//Always run at at most processorCount-1 threads (one core reserved for unity thread).
+		//		// Many computers use hyperthreading, so dividing by two is used to remove the hyperthreading cores, pathfinding
+		//		// doesn't scale well past the number of physical cores anyway
+		//		logicalCores /= 2;
+		//		logicalCores = Mathf.Max(1, logicalCores);
 
-				logicalCores = System.Math.Min(logicalCores, 6);
-			}
+		//		if (memory <= 1024) logicalCores = System.Math.Min(logicalCores, 2);
 
-			return logicalCores;
-		} else {
+		//		logicalCores = System.Math.Min(logicalCores, 6);
+		//	}
+
+		//	return logicalCores;
+		//} else {
 			int val = (int)count;
 			return val;
-		}
-#endif
+		//}
 	}
 
     /** Sets up all needed variables and scans the graphs.
@@ -1146,15 +1138,15 @@ public class AstarPath : BehaviourBase
 		// This class uses the [ExecuteInEditMode] attribute
 		// So Awake is called even when not playing
 		// Don't do anything when not in play mode
-		if (!Application.isPlaying) return;
+
 
 		if (OnAwakeSettings != null) {
 			OnAwakeSettings();
 		}
 
 		// To make sure all graph modifiers have been enabled before scan (to avoid script execution order issues)
-		GraphModifier.FindAllModifiers();
-		RelevantGraphSurface.FindAllGraphSurfaces();
+		//GraphModifier.FindAllModifiers();
+		//RelevantGraphSurface.FindAllGraphSurfaces();
 
 		InitializePathProcessor();
 		InitializeProfiler();
@@ -1166,7 +1158,7 @@ public class AstarPath : BehaviourBase
 
 		euclideanEmbedding.dirty = true;
 
-		if (scanOnStartup && (!data.cacheStartup || data.file_cachedStartup == null)) {
+		if (scanOnStartup && (!data.cacheStartup || data.data_cachedStartup == null)) {
 			Scan();
 		}
 	}
@@ -1174,9 +1166,9 @@ public class AstarPath : BehaviourBase
 	/** Initializes the #pathProcessor field */
 	void InitializePathProcessor () {
 		int numThreads = CalculateThreadCount(threadCount);
+        //int numThreads = 0;
 
-
-		int numProcessors = Mathf.Max(numThreads, 1);
+        int numProcessors = Mathf.Max(numThreads, 1);
 		bool multithreaded = numThreads > 0;
 
 		pathProcessor = new PathProcessor(this, pathReturnQueue, numProcessors, multithreaded);
@@ -1546,10 +1538,10 @@ public class AstarPath : BehaviourBase
 		// the nodes being valid when the path is returned
 		pathReturnQueue.ReturnPaths(false);
 
-		if (!Application.isPlaying) {
-			data.FindGraphTypes();
-			GraphModifier.FindAllModifiers();
-		}
+		//if (!Application.isPlaying) {
+		//	data.FindGraphTypes();
+		//	GraphModifier.FindAllModifiers();
+		//}
 
 
 		yield return new Progress(0.05F, "Pre processing graphs");
@@ -1559,7 +1551,7 @@ public class AstarPath : BehaviourBase
 			OnPreScan(this);
 		}
 
-		GraphModifier.TriggerEvent(GraphModifier.EventType.PreScan);
+		//GraphModifier.TriggerEvent(GraphModifier.EventType.PreScan);
 
 		data.LockGraphStructure();
 
@@ -1606,7 +1598,7 @@ public class AstarPath : BehaviourBase
 		if (OnPostScan != null) {
 			OnPostScan(this);
 		}
-		GraphModifier.TriggerEvent(GraphModifier.EventType.PostScan);
+		//GraphModifier.TriggerEvent(GraphModifier.EventType.PostScan);
 
 		FlushWorkItems();
 
@@ -1624,7 +1616,7 @@ public class AstarPath : BehaviourBase
 		if (OnLatePostScan != null) {
 			OnLatePostScan(this);
 		}
-		GraphModifier.TriggerEvent(GraphModifier.EventType.LatePostScan);
+		//GraphModifier.TriggerEvent(GraphModifier.EventType.LatePostScan);
 
 		euclideanEmbedding.dirty = true;
 		euclideanEmbedding.RecalculatePivots();
@@ -1639,7 +1631,7 @@ public class AstarPath : BehaviourBase
 
 		System.GC.Collect();
 
-		Log("Scanning - Process took "+(lastScanTime*1000).ToString("0")+" ms to complete");
+		//Log("Scanning - Process took "+(lastScanTime*1000).ToString("0")+" ms to complete");
 	}
 
 	IEnumerable<Progress> ScanGraph (NavGraph graph) {

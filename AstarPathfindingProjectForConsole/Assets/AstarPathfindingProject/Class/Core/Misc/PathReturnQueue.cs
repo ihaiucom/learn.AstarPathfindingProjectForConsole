@@ -43,7 +43,7 @@ namespace Pathfinding {
 		 * \param timeSlice Do not return all paths at once if it takes a long time, instead return some and wait until the next call.
 		 */
 		public void ReturnPaths (bool timeSlice) {
-			Profiler.BeginSample("Calling Path Callbacks");
+			//Profiler.BeginSample("Calling Path Callbacks");
 			// Pop all items from the stack
 			Path p = pathReturnStack.PopAll();
 
@@ -91,7 +91,7 @@ namespace Pathfinding {
 					}
 				}
 			}
-			Profiler.EndSample();
+			//Profiler.EndSample();
 		}
 	}
 }

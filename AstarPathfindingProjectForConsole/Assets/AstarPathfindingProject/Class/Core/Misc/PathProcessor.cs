@@ -132,7 +132,7 @@ namespace Pathfinding {
 		int Lock (bool block) {
 			queue.Block();
 
-			if (block && Application.isPlaying) {
+			if (block ) {
 				while (!queue.AllReceiversBlocked) {
 					if (IsUsingMultithreading) {
 						Thread.Sleep(1);

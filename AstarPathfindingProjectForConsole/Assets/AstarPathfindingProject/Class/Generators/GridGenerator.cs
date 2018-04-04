@@ -6,11 +6,10 @@ using UnityEngine.Profiling;
 #endif
 
 namespace Pathfinding {
-    using Pathfinding.Serialization;
-    using Pathfinding.Util;
-    using UnityEngine.Profiling;
+	using Pathfinding.Serialization;
+	using Pathfinding.Util;
 
-    [JsonOptIn]
+	[JsonOptIn]
 	/** Generates a grid of nodes.
 	 * The GridGraph does exactly what the name implies, generates nodes in a grid pattern.\n
 	 * Grid graphs suit well to when you already have a grid based world.

@@ -35,9 +35,7 @@ using Pathfinding.Util;
  * If it finds an RVOController attached to the same GameObject as this component, it will use that. If it fins a character controller it will also use that.
  * Lastly if will fall back to simply modifying Transform.position which is guaranteed to always work and is also the most performant option.
  */
-[RequireComponent(typeof(Seeker))]
-[AddComponentMenu("Pathfinding/AI/AIPath (2D,3D)")]
-[HelpURL("http://arongranberg.com/astar/docs/class_a_i_path.php")]
+
 public class AIPath : AIBase
 {
     /** Determines how often it will search for new paths.
@@ -50,8 +48,11 @@ public class AIPath : AIBase
 	 * The AI will try to follow/move towards this target.
 	 * It can be a point on the ground where the player has clicked in an RTS for example, or it can be the player object in a zombie game.
 	 */
+#if UNITY
     public Transform target;
-
+#else
+     public CustomTransform target;
+#endif
     /** Enables or disables searching for paths.
 	 * Setting this to false does not stop any active path requests from being calculated or stop it from continuing to follow the current path.
 	 * \see #canMove
